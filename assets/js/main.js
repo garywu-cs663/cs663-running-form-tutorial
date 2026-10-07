@@ -37,14 +37,20 @@ function setUpNarration() {
   var speakBtn = document.querySelector("[data-speak]");
   var stopBtn = document.querySelector("[data-speak-stop]");
   var textEl = document.querySelector("[data-narration-text]");
+  var fallback = document.querySelectorAll(".speech-controls, .speech-note");
+
+  if (audio) {
+    fallback.forEach(function (el) { el.style.display = "none"; });
+  }
 
   if (audio && status) {
     var showMissing = function () {
       var file = audio.getAttribute("src");
       status.textContent =
-        "The recorded narration file (" + file + ") has not been added yet. " +
-        "You can use the browser voice button below to preview the script.";
+        "The recorded narration file (" + file + ") could not be loaded. " +
+        "You can use the browser voice button below to hear the script instead.";
       status.hidden = false;
+      fallback.forEach(function (el) { el.style.display = ""; });
     };
     audio.addEventListener("error", showMissing);
     // The error event may fire before this script runs.
