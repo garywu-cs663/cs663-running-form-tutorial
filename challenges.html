@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>6. Successes, Failures, and Challenges | Temporal Understanding of Running Form</title>
+  <meta name="description" content="What temporal action-quality methods do well, where they fail, and how each limitation would affect a real running or coaching application.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-title" href="index.html">Temporal Understanding of Running Form <span>CS 663 Research Tutorial · Gary Wu</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+    <nav id="site-nav" class="site-nav" aria-label="Tutorial pages">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="introduction.html">1. Problem</a></li>
+        <li><a href="movement-over-time.html">2. Movement Over Time</a></li>
+        <li><a href="temporal-methods.html">3. Temporal Methods</a></li>
+        <li><a href="action-quality.html">4. Action Quality</a></li>
+        <li><a href="research.html">5. Research</a></li>
+        <li><a href="challenges.html" aria-current="page">6. Challenges</a></li>
+        <li><a href="conclusion.html">7. Future &amp; Quiz</a></li>
+        <li><a href="bibliography.html">8. Bibliography</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">Section 6</p>
+    <h1>Successes, Failures, and Challenges</h1>
+    <p class="lead">The results in Section 5 look strong, but they come from carefully controlled benchmarks. This page looks at what works, where these systems break down, and what each problem would mean for real runners.</p>
+
+    <section class="narration" aria-labelledby="narration-heading">
+      <h2 id="narration-heading">Page narration</h2>
+      <audio controls preload="metadata" src="assets/audio/challenges.mp3" data-narration-audio>
+        Your browser does not support the audio element. A text version of the narration is provided below.
+      </audio>
+      <p class="audio-status" data-audio-status hidden></p>
+      <div class="speech-controls">
+        <button type="button" data-speak>Listen to this page (browser voice)</button>
+        <button type="button" class="secondary" data-speak-stop disabled>Stop</button>
+      </div>
+      <p class="speech-note">The browser voice is a testing fallback that reads the script below. The recorded narration in the audio player is the official voice-over for this page.</p>
+      <details>
+        <summary>Read the narration script</summary>
+        <div data-narration-text>
+          <p>This section looks at what works and what still fails. The reviewed papers do show real progress. Phase segmentation on a fine-grained diving benchmark is very accurate, and combining appearance with body-structure information helped in cricket.</p>
+          <p>But a lot of problems remain. A model trained on side-view video may struggle with a different camera angle. Limbs can be blocked from view. Lighting and backgrounds change. Runners move at different speeds and have different bodies. Datasets are small and unbalanced, and the cricket study found its model overestimated poor strokes because it had few examples of them. Quality labels can be subjective, and similar-looking sequences can be confused. Methods built for diving may not transfer to running. Models can also be hard to explain and too slow for real-time use.</p>
+          <p>For each problem, I describe what it would actually mean for a coaching or training application.</p>
+        </div>
+      </details>
+    </section>
+
+    <h2>What works</h2>
+    <p>The successes are real. On FineDiving-HM, dive stages are segmented almost perfectly, with an average overlap of about 0.99, so when a movement has clear structure and the video is consistent, finding phase boundaries is mostly solved. Combining inputs helps too: in the cricket study, adding frame features to the keypoint stream raised the average correlation from 0.79 to 0.84. Long videos are becoming workable too, since UIL-AQA reports the best ranking agreement so far on gymnastics, skating, and swimming routines several minutes long. The catch is that each result was measured on data filmed the same way as the training data, in a single sport. The problems below are mostly about what happens when those conditions change <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>, <a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+
+    <figure>
+      <div class="diagram" role="img" aria-label="Five rows connecting a cause to a possible system error. Camera angle leads to mislabeled phases and wrong scores. Occlusion leads to guessed contact boundaries and unreliable timing. Lighting and background lead to the model scoring the scene instead of the runner. Limited data leads to poor strides being overestimated. Subjective labels lead to the model copying one coach's preferences.">
+        <div class="dg-map">
+          <span class="dg-map-head">Cause</span><span class="dg-map-head" aria-hidden="true"></span><span class="dg-map-head">Possible system error</span>
+          <div class="dg-box"><strong>Camera angle</strong> differs from training</div><span class="dg-arrow" aria-hidden="true">→</span><div class="dg-box error">Phases mislabeled, scores wrong without warning</div>
+          <div class="dg-box"><strong>Occlusion</strong> hides a leg or foot</div><span class="dg-arrow" aria-hidden="true">→</span><div class="dg-box error">Contact boundary guessed, phase timing unreliable</div>
+          <div class="dg-box"><strong>Lighting and background</strong> change</div><span class="dg-arrow" aria-hidden="true">→</span><div class="dg-box error">Model reacts to the scene instead of the runner</div>
+          <div class="dg-box"><strong>Limited, unbalanced data</strong></div><span class="dg-arrow" aria-hidden="true">→</span><div class="dg-box error">Rare poor strides get overestimated</div>
+          <div class="dg-box"><strong>Subjective labels</strong></div><span class="dg-arrow" aria-hidden="true">→</span><div class="dg-box error">Model copies one annotator's idea of "good form"</div>
+        </div>
+      </div>
+      <figcaption>
+        <span class="fig-label">Figure 6.</span> Five common causes of failure and the errors they can lead to. Each one is discussed below, along with the other limitations.
+        <span class="source-note">Source: Diagram by Gary Wu, made with AI assistance. Based on challenges described in Yin et al. [1], Moodley and van der Haar [3], and Han et al. [4].</span>
+      </figcaption>
+    </figure>
+
+    <h2>Video conditions</h2>
+
+    <h3>Camera-angle changes</h3>
+    <p>The same movement looks different from different viewpoints. Knee bend and forward lean are easy to see from the side but get squished together from the front. The cricket dataset avoided this on purpose by using an overhead cable camera with a consistent angle. <strong>In practice,</strong> a runner filming themselves on a phone will almost never match the training angle, and a side-view model could mislabel phases without any warning <a class="cite" href="bibliography.html#ref1">[1]</a>, <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+
+    <h3>Occlusion</h3>
+    <p>In running, the far leg is hidden behind the near leg for part of every stride, and other runners or treadmill rails can block the view too. <strong>In practice,</strong> this hits short phases hardest. If the foot is hidden at the moment it lands, the contact boundary has to be guessed, and every timing and score built on it gets less reliable.</p>
+
+    <h3>Lighting and background changes</h3>
+    <p>Models can end up relying on things that have nothing to do with the athlete. FineCausal was designed specifically because background, lighting, and audience can create misleading links to the score. <strong>In practice,</strong> a model trained on a treadmill in a gym might quietly depend on that background and then fail on an outdoor trail or in evening light <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+
+    <h2>Athlete variation</h2>
+
+    <h3>Different running speeds</h3>
+    <p>As runners speed up, stance gets shorter compared to the rest of the stride, and joint angles change. Yin et al. even use "run" as their example of an action that can be done fast, slow, or in different styles. <strong>In practice,</strong> a model trained mostly at jogging pace may treat normal sprinting as poor form unless speed is part of training or given as an input <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+
+    <h3>Different body types and athletes</h3>
+    <p>Height, limb length, age, and ability all change how a person moves, but the cricket dataset only includes international Test batters, and the diving benchmarks are elite competitors. Yin et al. argue that AQA systems need to be fair across different groups of people. <strong>In practice,</strong> a model trained on elite athletes might judge recreational or older runners against a standard that doesn't fit them <a class="cite" href="bibliography.html#ref1">[1]</a>, <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+
+    <h3>Similar-looking movement sequences</h3>
+    <p>The difference between an "average" and a "good" push-off may only show up in a frame or two. <strong>In practice,</strong> if the model can't reliably tell these apart but has to output a score anyway, scores may swing back and forth for strides that are basically identical, and runners will stop trusting it.</p>
+
+    <h2>Data and labels</h2>
+
+    <h3>Limited or unbalanced datasets</h3>
+    <p>AQA datasets are small because experts have to choose and label the videos. They are often unbalanced too. In the cricket study, poor strokes were rare, and the model tended to overestimate them. <strong>In practice,</strong> this is backwards from what a coach needs, since the weakest strides are the ones worth flagging <a class="cite" href="bibliography.html#ref1">[1]</a>, <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+
+    <h3>Subjective quality labels</h3>
+    <p>As Section 4 explained, there is no gold standard for good form, and running has no official scoring system. Even in judged sports, judges disagree. Dong et al. deal with this by adding small random noise to the model's predictions during training, so it doesn't overfit to any one judge's habits. <strong>In practice,</strong> a running model learns whatever its annotators believed, so if they favored one coaching style, it will push every runner toward that style <a class="cite" href="bibliography.html#ref1">[1]</a>, <a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+
+    <h3>Difficulty transferring results between sports</h3>
+    <p>Each paper in Section 5 reports results on its own benchmark. FineCausal's causal structure depends on sport-specific expert knowledge, and UIL-AQA's fixed-length clips don't line up with natural movements, which its authors list as future work. For running, the natural unit would be a stride, and stride length changes with speed. <strong>In practice,</strong> nobody can point a diving or gymnastics model at a runner and expect it to work. The architecture ideas may carry over, but the labels, phases, and data would have to be rebuilt <a class="cite" href="bibliography.html#ref4">[4]</a>, <a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+
+    <h2>Deployment</h2>
+
+    <h3>Difficulty explaining model decisions</h3>
+    <p>Yin et al. describe black-box behavior as one of the main open problems in AQA. Attention maps show what a model paid attention to, not why a movement was good or bad. <strong>In practice,</strong> a coach can't act on "push-off scored 4/10" with no visible reason. They either ignore it or trust it blindly <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+
+    <h3>Real-time processing limits</h3>
+    <p>Better models tend to be heavier. Few AQA methods are built to be lightweight, many only assess an action after it ends, and FineCausal took about a day to train. UIL-AQA shows the temporal part can be small: its decoder has about 5.5 million parameters and runs in under 2 milliseconds per video, but only after a large backbone has already extracted features from every clip. <strong>In practice,</strong> live feedback on a phone isn't realistic yet for the most accurate models, so reviewing video after the run is the practical option <a class="cite" href="bibliography.html#ref1">[1]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>, <a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+
+    <h3>Overconfident feedback</h3>
+    <p>This one comes from all the others. A model always produces an output, even for input unlike anything it has seen. <strong>In practice,</strong> a running-form tool should show its confidence, hold back feedback when confidence is low, and make clear that it describes movement patterns, not medical advice.</p>
+
+    <nav class="page-nav" aria-label="Page sequence">
+      <a href="research.html">← 5. Current Research, Applications, and Results</a>
+      <a href="conclusion.html">Next: 7. Future Applications, Quiz, and Conclusion →</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div>CS 663 Project 1 Research Tutorial · Gary Wu · Researched and written by Gary Wu, with AI assistance in drafting, diagrams, and site code.</div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home | Fine-Grained Temporal Understanding of Running Form</title>
+  <meta name="description" content="A CS 663 research tutorial by Gary Wu on temporal video understanding and fine-grained action-quality assessment, motivated by running form.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-title" href="index.html">Temporal Understanding of Running Form <span>CS 663 Research Tutorial · Gary Wu</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+    <nav id="site-nav" class="site-nav" aria-label="Tutorial pages">
+      <ul>
+        <li><a href="index.html" aria-current="page">Home</a></li>
+        <li><a href="introduction.html">1. Problem</a></li>
+        <li><a href="movement-over-time.html">2. Movement Over Time</a></li>
+        <li><a href="temporal-methods.html">3. Temporal Methods</a></li>
+        <li><a href="action-quality.html">4. Action Quality</a></li>
+        <li><a href="research.html">5. Research</a></li>
+        <li><a href="challenges.html">6. Challenges</a></li>
+        <li><a href="conclusion.html">7. Future &amp; Quiz</a></li>
+        <li><a href="bibliography.html">8. Bibliography</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">CS 663 · Project 1 · Research Tutorial</p>
+    <h1>Fine-Grained Temporal Understanding of Running Form in Video</h1>
+    <p class="meta">By Gary Wu · Estimated time: about 20 minutes</p>
+
+    <p class="lead">When a coach watches someone run, they do not judge a single photo. They watch how each stride unfolds: when the foot lands, how long it stays down, and how smoothly the runner pushes off. This tutorial explains how computer-vision research is learning to analyze movement across an entire video instead of one image at a time.</p>
+
+    <section class="narration" aria-labelledby="narration-heading">
+      <h2 id="narration-heading">Audio introduction</h2>
+      <audio controls preload="metadata" src="assets/audio/home.mp3" data-narration-audio>
+        Your browser does not support the audio element. A text version of the narration is provided below.
+      </audio>
+      <p class="audio-status" data-audio-status hidden></p>
+      <div class="speech-controls">
+        <button type="button" data-speak>Listen to this page (browser voice)</button>
+        <button type="button" class="secondary" data-speak-stop disabled>Stop</button>
+      </div>
+      <p class="speech-note">The browser voice is a testing fallback that reads the script below. The recorded narration in the audio player is the official voice-over for this page.</p>
+      <details>
+        <summary>Read the narration script</summary>
+        <div data-narration-text>
+          <p>Hi, I'm Gary Wu, and this is my CS 663 research tutorial on fine-grained temporal understanding of running form in video. When a coach watches someone run, they don't judge a single photo. They watch how each stride unfolds: when the foot lands, how long it stays on the ground, and how smoothly the runner pushes off. In this tutorial, I explain how computer-vision research is trying to do something similar.</p>
+          <p>The main question is how systems can use the timing, order, and phases of movement to evaluate running form better than analyzing individual frames. My thesis is that temporal models and action-quality assessment are moving the field in that direction, but they still face real limits: small datasets, subjective ideas of good form, camera-angle changes, new athletes, and feedback that is hard to explain.</p>
+          <p>Many of the papers I review study diving and cricket rather than running, so I use them to teach general methods, not as proof that running is solved. The tutorial has eight sections, six diagrams, two interactive tools, and a three-question quiz at the end. It should take about fifteen to twenty minutes.</p>
+        </div>
+      </details>
+    </section>
+
+    <h2>What this tutorial is about</h2>
+    <p>Most people's first idea of "computer vision for sports" is a system that finds body positions in a photo. That is useful, but movement quality lives in <em>time</em>: the order of events, how long each one lasts, and how smoothly one phase turns into the next. Over the past decade, a research area called <strong>action-quality assessment (AQA)</strong> has grown around the question of how well an action is performed, not just which action it is <a class="cite" href="bibliography.html#ref1">[1]</a>. This tutorial uses running form as the motivating example and focuses on the temporal methods behind that research.</p>
+
+    <div class="callout">
+      <span class="callout-title">Research question</span>
+      <p>How can computer-vision systems use the timing, order, and phases of movement to evaluate running form more effectively than analyzing individual video frames?</p>
+    </div>
+
+    <div class="callout good">
+      <span class="callout-title">Main thesis</span>
+      <p>Recent computer-vision research is moving beyond simple frame-by-frame body-position analysis by using temporal models and action-quality assessment to understand how movements develop over time. These methods may improve running-form analysis, but they still face challenges involving limited datasets, subjective definitions of good form, different camera angles, generalization to new athletes, and explaining their feedback.</p>
+    </div>
+
+    <h2>Learning objectives</h2>
+    <p>By the end of this tutorial, you should be able to:</p>
+    <ol>
+      <li>Explain why a single frame cannot fully describe a running movement, and what timing and order add.</li>
+      <li>Distinguish action recognition from action-quality assessment.</li>
+      <li>Describe temporal action segmentation and how it finds the beginnings, transitions, and endings of movement phases.</li>
+      <li>Compare temporal convolutional networks (TCNs), LSTMs, and video transformers, including their trade-offs.</li>
+      <li>Walk through a video-to-quality-score pipeline and state its assumptions and operating conditions.</li>
+      <li>Summarize what recent research (2025–2026) has achieved and why those results do not yet prove that running-form analysis is solved.</li>
+      <li>Identify the main practical limitations, including camera angle, data size, and subjective labels.</li>
+    </ol>
+
+    <div class="callout warn">
+      <span class="callout-title">Scope note</span>
+      <p>This is a tutorial about <strong>research methods</strong> for temporal video understanding. It does not review software libraries or pose-estimation products, and it does not cover force, pressure, or balance estimation. When a paper uses body keypoints, I mention them only as one possible input representation. Nothing here is medical advice, and no system described here diagnoses injuries.</p>
+    </div>
+
+    <h2>Tutorial map</h2>
+    <ul class="card-grid">
+      <li class="card">
+        <a class="card-link" href="introduction.html">1. Introduction and Problem Definition</a>
+        <p>Why one image is not enough; recognition versus quality assessment; scope. <span class="meta">(~2 min)</span></p>
+      </li>
+      <li class="card">
+        <a class="card-link" href="movement-over-time.html">2. Understanding Athletic Movement Over Time</a>
+        <p>Running phases, timing, and an interactive stride timeline. <span class="meta">(~3 min)</span></p>
+      </li>
+      <li class="card">
+        <a class="card-link" href="temporal-methods.html">3. Temporal Video-Understanding Methods</a>
+        <p>Segmentation, TCNs, LSTMs, transformers, and a full algorithm walkthrough. <span class="meta">(~4 min)</span></p>
+      </li>
+      <li class="card">
+        <a class="card-link" href="action-quality.html">4. Fine-Grained Action-Quality Assessment</a>
+        <p>How quality scores are built, expert labels, and why "good form" is not universal. <span class="meta">(~3 min)</span></p>
+      </li>
+      <li class="card">
+        <a class="card-link" href="research.html">5. Current Research, Applications, and Results</a>
+        <p>Comparison table and summaries of five recent sources. <span class="meta">(~3 min)</span></p>
+      </li>
+      <li class="card">
+        <a class="card-link" href="challenges.html">6. Successes, Failures, and Challenges</a>
+        <p>Twelve limitations and what each means in practice. <span class="meta">(~2 min)</span></p>
+      </li>
+      <li class="card">
+        <a class="card-link" href="conclusion.html">7. Future Applications, Quiz, and Conclusion</a>
+        <p>Where the field is heading, a three-question quiz, and the final answer to the research question. <span class="meta">(~2 min)</span></p>
+      </li>
+      <li class="card">
+        <a class="card-link" href="bibliography.html">8. Annotated Bibliography</a>
+        <p>Full citations, synopses, and reliability ratings for all sources.</p>
+      </li>
+    </ul>
+
+    <p>Every page has a recorded narration. The pages also include six diagrams with captions and clickable citations such as <a class="cite" href="bibliography.html#ref1">[1]</a> that jump to the bibliography.</p>
+
+    <nav class="page-nav" aria-label="Page sequence">
+      <span></span>
+      <a href="introduction.html">Next: 1. Introduction and Problem Definition →</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div>CS 663 Project 1 Research Tutorial · Gary Wu · Researched and written by Gary Wu, with AI assistance in drafting, diagrams, and site code.</div>
+  </footer>
+</body>
+</html>

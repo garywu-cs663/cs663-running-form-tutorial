@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4. Fine-Grained Action-Quality Assessment | Temporal Understanding of Running Form</title>
+  <meta name="description" content="What action-quality assessment is, how phase-level scores and expert labels are created, why good running form is not universal, and why interpretable feedback matters.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-title" href="index.html">Temporal Understanding of Running Form <span>CS 663 Research Tutorial · Gary Wu</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+    <nav id="site-nav" class="site-nav" aria-label="Tutorial pages">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="introduction.html">1. Problem</a></li>
+        <li><a href="movement-over-time.html">2. Movement Over Time</a></li>
+        <li><a href="temporal-methods.html">3. Temporal Methods</a></li>
+        <li><a href="action-quality.html" aria-current="page">4. Action Quality</a></li>
+        <li><a href="research.html">5. Research</a></li>
+        <li><a href="challenges.html">6. Challenges</a></li>
+        <li><a href="conclusion.html">7. Future &amp; Quiz</a></li>
+        <li><a href="bibliography.html">8. Bibliography</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">Section 4</p>
+    <h1>Fine-Grained Action-Quality Assessment</h1>
+    <p class="lead">Segmenting a movement tells us <em>when</em> each phase happens. Action-quality assessment asks the harder question: <em>how well</em> was each phase performed, and who decides?</p>
+
+    <section class="narration" aria-labelledby="narration-heading">
+      <h2 id="narration-heading">Page narration</h2>
+      <audio controls preload="metadata" src="assets/audio/action-quality.mp3" data-narration-audio>
+        Your browser does not support the audio element. A text version of the narration is provided below.
+      </audio>
+      <p class="audio-status" data-audio-status hidden></p>
+      <div class="speech-controls">
+        <button type="button" data-speak>Listen to this page (browser voice)</button>
+        <button type="button" class="secondary" data-speak-stop disabled>Stop</button>
+      </div>
+      <p class="speech-note">The browser voice is a testing fallback that reads the script below. The recorded narration in the audio player is the official voice-over for this page.</p>
+      <details>
+        <summary>Read the narration script</summary>
+        <div data-narration-text>
+          <p>This section is about action-quality assessment, which asks how well an action was performed, not just what the action was. A useful way to think about it is that quality depends on both difficulty and execution.</p>
+          <p>Modern systems often break a movement into phases and score each phase, then combine those scores. For example, the cricket study I review scores five body regions for each stroke, and the diving studies model ordered stages of each dive.</p>
+          <p>Where do the scores come from? In diving, from official judges. In other sports, researchers write scoring guidelines with experts and have annotators label the videos. This is expensive, which is one reason datasets are small.</p>
+          <p>Running is harder still, because there is no single official definition of good running form. It depends on speed, goals, and the individual runner. That is why I argue that interpretable, phase-specific feedback matters more than a single number.</p>
+        </div>
+      </details>
+    </section>
+
+    <h2>What action-quality assessment means</h2>
+    <p>Action-quality assessment (AQA) measures how well an action is performed, and ideally gives feedback on it. Quality has two parts. <strong>Difficulty</strong> is what the athlete attempted, and <strong>execution</strong> is how well it was done, such as keeping the legs together in a dive. Running doesn't have difficulty ratings, so almost all of the interest is in execution. Unlike recognition, which separates running from walking, AQA separates performances <em>within</em> the same action, where the difference might be a slightly late push-off that lasts only a few frames. That is why it is called "fine-grained." Yin et al. describe three levels of ambition: predicting one score, identifying which elements were good or bad, and generating feedback on what to work on. Most published systems sit at the first or second level <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+
+    <h2>Evaluating each phase of a movement</h2>
+    <p>Instead of producing one score from the whole video, fine-grained methods look at each phase. Xu et al.'s Uni-FineParser first works out what sub-action is happening, when, and where the athlete is, and only then judges quality. Moodley and van der Haar's cricket dataset gives separate scores to five body regions (head, shoulders, hands, hips, and feet), so the output points to where a stroke went wrong. FineCausal builds features for each stage of a dive and models how each stage affects the next <a class="cite" href="bibliography.html#ref2">[2]</a>, <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+
+    <h2>How quality scores and labels are created</h2>
+    <p>A model can only learn what its labels define. The survey by Yin et al. groups the main label formats as follows <a class="cite" href="bibliography.html#ref1">[1]</a>:</p>
+    <div class="table-wrap" role="region" aria-label="Label formats" tabindex="0">
+      <table>
+        <caption>Common label formats in AQA</caption>
+        <thead>
+          <tr><th scope="col">Format</th><th scope="col">What the label looks like</th><th scope="col">Trade-off</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Regression</td><td>A continuous score, such as a judge's dive score</td><td>Fine detail, but needs consistent expert scores</td></tr>
+          <tr><td>Classification</td><td>A category, such as poor, average, good, or excellent</td><td>Coarser, but easier to label</td></tr>
+          <tr><td>Pairwise ranking</td><td>"Video A is better than video B"</td><td>Easier for people to judge, but gives no absolute score</td></tr>
+          <tr><td>Rule-based</td><td>Scores computed from explicit rules</td><td>Explainable, but the rules must be written by hand</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Models are then compared against these labels. The most common metric is <strong>Spearman's rank correlation</strong> (ρ), which checks whether the model ranks performances in the same order as the experts (from −1 to 1, higher is better). Since ρ ignores how far off the actual numbers are, papers also report <strong>relative ℓ2 distance</strong>, a normalized error where lower is better.</p>
+    <p>Making these labels is expensive. Diving can reuse official judges' scores, but where no official score exists, researchers have to create one. For the cricket dataset, the authors wrote a scoring guideline with two cricket experts and had annotators segment and score each clip. Spatial labels cost even more: FineDiving-HM includes 312,256 frames with hand-made athlete masks. This cost is a big reason AQA datasets stay small <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+
+    <h2>Why "good running form" is not universal</h2>
+    <p>Diving has a rulebook. Running does not. Good form depends on what the runner is trying to do, since a sprinter moves very differently from a marathon runner, and even one person's form changes between an easy jog and race pace. Limb length, strength, flexibility, shoes, terrain, and fatigue all play a part, and coaches don't always agree when watching the same stride. Yin et al. note that AQA has no "gold standard" action to compare against at all. For running, this means a quality label only makes sense relative to a stated goal and a written rubric. A model trained on one coach's labels learns that coach's preferences, not a universal truth <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+
+    <h2>Why interpretable feedback matters</h2>
+    <p>A score of "6.8 out of 10" doesn't tell a runner what to change. Useful feedback needs to say <strong>when</strong> (which phase), <strong>what</strong> (which body region or timing), and <strong>how sure</strong> the system is. Some recent methods try to build this in. FineCausal's attention over stages shows which phases most influenced the score, and the cricket model's body-region scores point to where a stroke went wrong. UIL-AQA goes further and gives every clip of a long routine its own difficulty and quality score. When the authors asked 15 people to compare pairs of clips, people agreed with the model's judgments about 73% of the time. These help, but they are still the model's view, so they should be treated as suggestions for a coach to check, not proven causes <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>, <a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+
+    <nav class="page-nav" aria-label="Page sequence">
+      <a href="temporal-methods.html">← 3. Temporal Video-Understanding Methods</a>
+      <a href="research.html">Next: 5. Current Research, Applications, and Results →</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div>CS 663 Project 1 Research Tutorial · Gary Wu · Researched and written by Gary Wu, with AI assistance in drafting, diagrams, and site code.</div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>8. Annotated Bibliography | Temporal Understanding of Running Form</title>
+  <meta name="description" content="Annotated bibliography for the CS 663 research tutorial on temporal understanding of running form: full citations, synopses, and reliability ratings.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-title" href="index.html">Temporal Understanding of Running Form <span>CS 663 Research Tutorial · Gary Wu</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+    <nav id="site-nav" class="site-nav" aria-label="Tutorial pages">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="introduction.html">1. Problem</a></li>
+        <li><a href="movement-over-time.html">2. Movement Over Time</a></li>
+        <li><a href="temporal-methods.html">3. Temporal Methods</a></li>
+        <li><a href="action-quality.html">4. Action Quality</a></li>
+        <li><a href="research.html">5. Research</a></li>
+        <li><a href="challenges.html">6. Challenges</a></li>
+        <li><a href="conclusion.html">7. Future &amp; Quiz</a></li>
+        <li><a href="bibliography.html" aria-current="page">8. Bibliography</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">Section 8</p>
+    <h1>Annotated Bibliography</h1>
+    <p class="lead">These are the five sources used throughout the tutorial, numbered in the order they first appear on the site. Every bracketed number elsewhere on the site, like [1], links to its entry here.</p>
+
+    <section class="narration" aria-labelledby="narration-heading">
+      <h2 id="narration-heading">Page narration</h2>
+      <audio controls preload="metadata" src="assets/audio/bibliography.mp3" data-narration-audio>
+        Your browser does not support the audio element. A text version of the narration is provided below.
+      </audio>
+      <p class="audio-status" data-audio-status hidden></p>
+      <div class="speech-controls">
+        <button type="button" data-speak>Listen to this page (browser voice)</button>
+        <button type="button" class="secondary" data-speak-stop disabled>Stop</button>
+      </div>
+      <p class="speech-note">The browser voice is a testing fallback that reads the script below. The recorded narration in the audio player is the official voice-over for this page.</p>
+      <details>
+        <summary>Read the narration script</summary>
+        <div data-narration-text>
+          <p>This page lists the five scholarly sources used in the tutorial, numbered in the order they first appear on the site. Each citation link on the other pages jumps to the matching entry here.</p>
+          <p>For every source, I give the full citation, a DOI link, a short synopsis, a reliability rating, and an explanation of why it is useful for this tutorial. All five were published in 2025 or 2026, in peer-reviewed journals or conference proceedings.</p>
+          <p>I also note which version of each paper I read. Four of the five are open access, and I read the fifth through my university library.</p>
+        </div>
+      </details>
+    </section>
+
+    <p><strong>Reliability scale used here:</strong> <em>High</em> means peer-reviewed in a major venue, with methods and results I checked in the full text of the paper. Four of the five sources are open access. Xu et al. [2] requires library access.</p>
+
+    <article class="bib-entry" id="ref1">
+      <h2>[1] A decade of action quality assessment: Largest systematic survey of trends, challenges, and future directions</h2>
+      <p class="bib-citation">Yin, H., Parmar, P., Xu, D., Zhang, Y., Zheng, T., &amp; Fu, W. (2026). A decade of action quality assessment: Largest systematic survey of trends, challenges, and future directions. <em>International Journal of Computer Vision, 134</em>(2), Article 73. <a href="https://doi.org/10.1007/s11263-025-02672-4">https://doi.org/10.1007/s11263-025-02672-4</a></p>
+      <p><strong>Synopsis:</strong> A systematic review of more than 200 AQA papers. It defines the task, explains the standard metrics and datasets, groups recent work into seven trends, and lists open challenges such as the lack of a gold standard, small datasets, and black-box models.</p>
+      <p><strong>Reliability:</strong> <span class="rating">High</span> The <em>International Journal of Computer Vision</em> is a long-running, peer-reviewed Springer journal and one of the main journals in the field. Co-author Paritosh Parmar has published widely on AQA. I read the open-access arXiv preprint (v1, February 2025), and some counts in the published version may differ slightly.</p>
+      <p><strong>Why it is useful:</strong> It gives the tutorial its vocabulary and its frame for the field. The definitions in Section 4 and most of the challenges in Section 6 come from this survey.</p>
+    </article>
+
+    <article class="bib-entry" id="ref2">
+      <h2>[2] Human-centric fine-grained action quality assessment</h2>
+      <p class="bib-citation">Xu, J., Yin, S., &amp; Peng, Y. (2025). Human-centric fine-grained action quality assessment. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence, 47</em>(8), 6242–6255. <a href="https://doi.org/10.1109/TPAMI.2025.3556935">https://doi.org/10.1109/TPAMI.2025.3556935</a></p>
+      <p><strong>Synopsis:</strong> Proposes Uni-FineParser, which focuses on the athlete in each frame and parses each dive into steps over time before scoring it. It beats earlier methods on three benchmarks, and its ablations show that the temporal parsing step matters most.</p>
+      <p><strong>Reliability:</strong> <span class="rating">High</span> <em>IEEE TPAMI</em> is one of the most selective peer-reviewed journals in computer vision. I read the full published version through CSU East Bay's IEEE Xplore access. The paper is paywalled, but the code is public, and an earlier version (FineParser, CVPR 2024) is open access.</p>
+      <p><strong>Why it is useful:</strong> It is the clearest statement of why fine-grained, phase-aware parsing is needed, and its focus on separating the athlete from the background maps directly onto separating a runner from a busy scene.</p>
+    </article>
+
+    <article class="bib-entry" id="ref3">
+      <h2>[3] I3D-AE-LSTM: A 2-stream autoencoder for action quality assessment using a newly created cricket batsman video dataset</h2>
+      <p class="bib-citation">Moodley, T., &amp; van der Haar, D. T. (2025). I3D-AE-LSTM: A 2-stream autoencoder for action quality assessment using a newly created cricket batsman video dataset. In <em>Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)</em> (pp. 5470–5478). <a href="https://doi.org/10.1109/WACV61041.2025.00534">https://doi.org/10.1109/WACV61041.2025.00534</a></p>
+      <p><strong>Synopsis:</strong> Introduces a dataset of 8,540 cricket strokes split into phases and scored for five body regions. A two-stream model (I3D frame features plus an LSTM autoencoder over keypoints) reaches an average Spearman correlation of 0.84, though it overestimates rare poor strokes.</p>
+      <p><strong>Reliability:</strong> <span class="rating">High</span> WACV is a peer-reviewed IEEE/CVF conference. I read the full open-access version from the Computer Vision Foundation, and the dataset and code are publicly available. The evaluation covers a single sport and a single dataset, so the results should be read within that scope.</p>
+      <p><strong>Why it is useful:</strong> It is the best example in this tutorial of phase-structured, body-region scoring, and its data imbalance problem is an honest look at a real limitation.</p>
+    </article>
+
+    <article class="bib-entry" id="ref4">
+      <h2>[4] FineCausal: A causal-based framework for interpretable fine-grained action quality assessment</h2>
+      <p class="bib-citation">Han, R., Zhou, K., Atapour-Abarghouei, A., Liang, X., &amp; Shum, H. P. H. (2025). FineCausal: A causal-based framework for interpretable fine-grained action quality assessment. In <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW)</em> (pp. 6064–6073). <a href="https://doi.org/10.1109/CVPRW67362.2025.00599">https://doi.org/10.1109/CVPRW67362.2025.00599</a></p>
+      <p><strong>Synopsis:</strong> Separates athlete features from background and uses masked self-attention to model how each stage of a dive affects the next. It slightly beats the previous best method on FineDiving-HM (ρ = 0.9447) while keeping stage segmentation highly accurate, but it needs expert knowledge and costly labels.</p>
+      <p><strong>Reliability:</strong> <span class="rating">High</span> This is a peer-reviewed paper from the CVsports workshop at CVPR, the field's largest conference. Workshop papers are usually reviewed less strictly than main-conference papers. I read the full open-access version, and the code is public.</p>
+      <p><strong>Why it is useful:</strong> It shows clearly how temporal attention can model the chain of phases, and it is the main source here for segmentation accuracy and for interpretability.</p>
+    </article>
+
+    <article class="bib-entry" id="ref5">
+      <h2>[5] UIL-AQA: Uncertainty-aware clip-level interpretable action quality assessment</h2>
+      <p class="bib-citation">Dong, X., Liu, X., Li, W., Adeyemi-Ejeye, A., &amp; Gilbert, A. (2025). UIL-AQA: Uncertainty-aware clip-level interpretable action quality assessment. <em>International Journal of Computer Vision</em>. Published online December 28, 2025. <a href="https://doi.org/10.1007/s11263-025-02638-6">https://doi.org/10.1007/s11263-025-02638-6</a></p>
+      <p><strong>Synopsis:</strong> Scores long gymnastics, skating, and artistic-swimming routines with a transformer decoder that gives every clip its own difficulty and quality score. It fixes a "temporal skipping" problem with an extra attention loss and adds noise during training to account for disagreement between judges.</p>
+      <p><strong>Reliability:</strong> <span class="rating">High</span> The <em>International Journal of Computer Vision</em> is a leading peer-reviewed Springer journal. This article is open access, so I read the full text, and the code is public. It extends the authors' earlier BMVC 2024 paper.</p>
+      <p><strong>Why it is useful:</strong> It is the only source here that handles long videos and models disagreement between judges, and running videos are long and labels for running form are subjective.</p>
+    </article>
+
+    <p class="meta">All five sources were published in 2025 or 2026. No older background sources were added.</p>
+
+    <nav class="page-nav" aria-label="Page sequence">
+      <a href="conclusion.html">← 7. Future Applications, Quiz, and Conclusion</a>
+      <a href="index.html">Back to Home</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div>CS 663 Project 1 Research Tutorial · Gary Wu · Researched and written by Gary Wu, with AI assistance in drafting, diagrams, and site code.</div>
+  </footer>
+</body>
+</html>

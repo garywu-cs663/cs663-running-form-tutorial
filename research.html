@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>5. Current Research, Applications, and Results | Temporal Understanding of Running Form</title>
+  <meta name="description" content="A comparison of five recent (2025–2026) action-quality assessment sources: datasets, temporal methods, metrics, results, limitations, and relevance to running.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-title" href="index.html">Temporal Understanding of Running Form <span>CS 663 Research Tutorial · Gary Wu</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+    <nav id="site-nav" class="site-nav" aria-label="Tutorial pages">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="introduction.html">1. Problem</a></li>
+        <li><a href="movement-over-time.html">2. Movement Over Time</a></li>
+        <li><a href="temporal-methods.html">3. Temporal Methods</a></li>
+        <li><a href="action-quality.html">4. Action Quality</a></li>
+        <li><a href="research.html" aria-current="page">5. Research</a></li>
+        <li><a href="challenges.html">6. Challenges</a></li>
+        <li><a href="conclusion.html">7. Future &amp; Quiz</a></li>
+        <li><a href="bibliography.html">8. Bibliography</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">Section 5</p>
+    <h1>Current Research, Applications, and Results</h1>
+    <p class="lead">This section compares five recent sources: one large survey and four method papers. Together they show where temporal action-quality assessment stands in 2025–2026.</p>
+
+    <section class="narration" aria-labelledby="narration-heading">
+      <h2 id="narration-heading">Page narration</h2>
+      <audio controls preload="metadata" src="assets/audio/research.mp3" data-narration-audio>
+        Your browser does not support the audio element. A text version of the narration is provided below.
+      </audio>
+      <p class="audio-status" data-audio-status hidden></p>
+      <div class="speech-controls">
+        <button type="button" data-speak>Listen to this page (browser voice)</button>
+        <button type="button" class="secondary" data-speak-stop disabled>Stop</button>
+      </div>
+      <p class="speech-note">The browser voice is a testing fallback that reads the script below. The recorded narration in the audio player is the official voice-over for this page.</p>
+      <details>
+        <summary>Read the narration script</summary>
+        <div data-narration-text>
+          <p>In this section I compare five recent sources from 2025 and 2026. One is a large survey of a decade of action-quality assessment research. The other four are method papers. Two of them, Uni-FineParser and FineCausal, focus on diving and parse each dive in time and space before scoring it. One introduces a cricket batting dataset, scored by body region for each phase of the stroke. And one, UIL-AQA, scores long gymnastics, skating, and swimming routines clip by clip, while trying to account for disagreement between judges.</p>
+          <p>I want to be clear that none of these papers study running. I use them because they show general methods for temporal modeling and quality scoring that could transfer to running. The comparison table lists each paper's data, temporal method, outputs, metrics, and main results, using only numbers I could confirm in the papers themselves.</p>
+        </div>
+      </details>
+    </section>
+
+    <div class="callout warn">
+      <span class="callout-title">Important: these papers are not about running</span>
+      <p>Most recent fine-grained AQA work studies <strong>diving</strong> and other judged sports such as gymnastics and figure skating, and one paper studies <strong>cricket batting</strong>. These sports have official scores or expert rubrics and broadcast-quality video, which makes them practical research benchmarks. I use these papers to teach <em>general</em> temporal and quality-assessment methods. Their results are <strong>not</strong> evidence that these methods already work for running-form analysis. The "Relevance to running" column describes how the ideas <em>might</em> transfer.</p>
+    </div>
+
+    <h2>Research comparison table</h2>
+    <p>Scroll sideways on small screens. Numbers are copied from the papers' own reported results. I only list values I could confirm in the text of each paper.</p>
+
+    <div class="table-wrap" role="region" aria-label="Research comparison table, scrollable" tabindex="0">
+      <table class="wide">
+        <caption>Comparison of the five core sources</caption>
+        <thead>
+          <tr>
+            <th scope="col">Paper</th>
+            <th scope="col">Sport or activity</th>
+            <th scope="col">Input data</th>
+            <th scope="col">Temporal method</th>
+            <th scope="col">Model output</th>
+            <th scope="col">Evaluation metric</th>
+            <th scope="col">Main result</th>
+            <th scope="col">Limitation</th>
+            <th scope="col">Relevance to running</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Yin et al., 2026 <a class="cite" href="bibliography.html#ref1">[1]</a><br><span class="meta">Survey</span></th>
+            <td>Many domains: sports, rehabilitation, fitness, surgery, and more</td>
+            <td>Over 200 AQA papers selected with the PRISMA systematic-review process</td>
+            <td>Reviews temporal designs across the field, including 3D CNN backbones, recurrent models, TCNs, and transformers</td>
+            <td>Taxonomy, metric definitions, dataset summaries, trends, and open challenges</td>
+            <td>Systematic literature review (not an experiment)</td>
+            <td>Identifies seven research trends, including fine-grained, multimodal, explainable, and self-supervised AQA</td>
+            <td>Summarizes rather than tests methods. Results across papers are not always directly comparable</td>
+            <td>Defines the vocabulary and challenges (no gold standard, small datasets, black-box models) that apply to running</td>
+          </tr>
+          <tr>
+            <th scope="row">Xu, Yin &amp; Peng, 2025 (Uni-FineParser) <a class="cite" href="bibliography.html#ref2">[2]</a></th>
+            <td>Diving, plus other judged Olympic events in AQA-7 (vault, skiing, snowboarding, trampoline)</td>
+            <td>RGB video with new athlete-mask annotations (FineDiving-HM has 312,256 masks), compared against a scored exemplar video</td>
+            <td>Transformer-style temporal decoder with learnable queries that splits the action into steps, trained on labeled step transitions. Mask-guided attention inside the I3D backbone</td>
+            <td>Action quality score, plus parsed steps and athlete attention maps</td>
+            <td>Spearman's ρ and relative ℓ2</td>
+            <td>Beats prior methods on FineDiving, AQA-7, and MTL-AQA. On FineDiving, improves ρ by 1.93% and relative ℓ2 by 0.0854 over CoRe. Smaller than its predecessor FineParser (35.9M vs. 51.8M parameters). Removing temporal parsing hurt most in ablations</td>
+            <td>Needs dense mask annotations. Weaker on events where the athlete is hard to isolate (BigSnow, Sync. 3m). Broadcast sports only</td>
+            <td>Separating the runner from the background and parsing each stride before scoring maps directly to running</td>
+          </tr>
+          <tr>
+            <th scope="row">Moodley &amp; van der Haar, 2025 (I3D-AE-LSTM) <a class="cite" href="bibliography.html#ref3">[3]</a></th>
+            <td>Cricket batting</td>
+            <td>New UJ-AQA-CricketVision dataset: 8,540 stroke clips, with RGB frames plus body keypoints as a second stream</td>
+            <td>I3D clip features plus an LSTM autoencoder for keypoint sequences. An LSTM aggregates features over time</td>
+            <td>Five scores per stroke: head, shoulders, hands, hips, and feet</td>
+            <td>Spearman rank correlation, averaged over the five body regions</td>
+            <td>Average ρ of 0.84 on their dataset, compared with 0.68 (C3D-LSTM) and 0.60 (I3D-DAE) baselines</td>
+            <td>Experiments use only the 4-frame execution phase. Few low-quality examples, so poor strokes are overestimated</td>
+            <td>Phase-structured, body-region scores are a model for phase-specific running feedback</td>
+          </tr>
+          <tr>
+            <th scope="row">Han et al., 2025 (FineCausal) <a class="cite" href="bibliography.html#ref4">[4]</a></th>
+            <td>Diving</td>
+            <td>FineDiving-HM: 3,000 videos with official scores, stage boundaries, and 312,256 athlete-mask frames. Query and exemplar videos</td>
+            <td>Temporal action parser plus masked (causal) self-attention across dive stages. Graph attention separates athlete cues from background</td>
+            <td>Score, stage segmentation, and attention weights showing stage influence</td>
+            <td>Spearman's ρ, relative ℓ2 (×100), and average IoU at 0.5 and 0.75 for stage segmentation</td>
+            <td>ρ = 0.9447 and relative ℓ2 = 0.2338, compared with 0.9435 and 0.2602 for the previous best method (FineParser). Average IoU ≈ 0.99 at 0.5 and 0.945 at 0.75</td>
+            <td>Requires expert knowledge to define the causal structure and costly fine-grained labels. One dataset</td>
+            <td>Modeling how one phase affects the next (for example, contact affecting push-off) fits running's chain of phases</td>
+          </tr>
+          <tr>
+            <th scope="row">Dong et al., 2025 (UIL-AQA) <a class="cite" href="bibliography.html#ref5">[5]</a></th>
+            <td>Long routines: rhythmic gymnastics, figure skating, and group artistic swimming</td>
+            <td>RG, Fis-V, and LOGO datasets, with videos of roughly 1.5 to 3.5 minutes. Features from a frozen I3D or Video Swin backbone</td>
+            <td>Transformer decoder with learnable queries over fixed-length clips, plus an attention loss to stop "temporal skipping"</td>
+            <td>Overall score, plus a difficulty and a quality score for every clip</td>
+            <td>Spearman's ρ (main), relative ℓ2, and MSE. Also a 15-person user study</td>
+            <td>Best reported ρ on all three datasets (6.32% over the prior best on RG). Attention loss alone raised ρ from 0.628 to 0.807. 73% agreement with people on clip difficulty and quality</td>
+            <td>Fixed-length clips can cut across real movements. Clip scores are learned without clip labels and not yet checked by expert judges. Judged sports only</td>
+            <td>Running videos are long and repetitive. Per-clip quality scores point toward per-stride feedback, and noise injection is one way to handle subjective labels</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Paper-by-paper summaries</h2>
+    <p>Each summary covers the problem, method, results, limitations, and what transfers to running.</p>
+
+    <article class="card" aria-labelledby="p1">
+      <h3 id="p1">[1] A decade of action-quality assessment (Yin et al., 2026) <a class="cite" href="bibliography.html#ref1">[1]</a></h3>
+      <p>This survey organizes more than 200 AQA papers, selected with the PRISMA review process. It defines the task, describes a generic pipeline, compares metrics, and groups recent work into seven trends. It also traces how temporal modeling moved from clip-level 3D CNNs toward attention-based models that parse actions into stages. It runs no experiments of its own, and results across papers aren't always comparable. Running isn't a focus, but every challenge it lists (no gold standard, small datasets, black-box models, high cost) applies to running, often more strongly.</p>
+    </article>
+
+    <article class="card" aria-labelledby="p2">
+      <h3 id="p2">[2] Human-centric fine-grained AQA: Uni-FineParser (Xu, Yin &amp; Peng, 2025) <a class="cite" href="bibliography.html#ref2">[2]</a></h3>
+      <p>The authors argue that models which learn one summary of a whole video lack fine-grained understanding. Uni-FineParser uses athlete masks to focus attention inside the backbone, then uses a transformer-style decoder with learnable queries to split each dive into steps, and finally scores the query video by comparing it step by step with an already-scored exemplar. It beats earlier methods on three benchmarks, and in their ablations, removing the temporal parsing step hurt more than removing the spatial or static-image parts. It is also smaller and cheaper than its predecessor. The masks are expensive to make, although masks from an automatic detector performed only slightly worse than hand-corrected ones. Every benchmark is broadcast sports. For running, separating the runner from a busy background and parsing each stride are both directly relevant.</p>
+    </article>
+
+    <article class="card" aria-labelledby="p3">
+      <h3 id="p3">[3] I3D-AE-LSTM for cricket batting (Moodley &amp; van der Haar, 2025) <a class="cite" href="bibliography.html#ref3">[3]</a></h3>
+      <p>This paper builds a cricket dataset of 8,540 stroke clips from broadcast footage. Each stroke is split into buildup, execution, and follow-through, and five body regions are scored using a guideline written with two cricket experts. The model combines I3D features from the frames with an LSTM autoencoder over body keypoints, then predicts the five scores. It reaches an average Spearman correlation of 0.84, compared with 0.68 and 0.60 for two baselines, and 0.79 for the keypoint stream alone. Only the short 4-frame execution phase was modeled, the players are all elite, and rare poor strokes were overestimated. Its per-phase, per-body-region scores are a natural template for running feedback about "what went wrong, and when."</p>
+    </article>
+
+    <article class="card" aria-labelledby="p4">
+      <h3 id="p4">[4] FineCausal (Han et al., 2025) <a class="cite" href="bibliography.html#ref4">[4]</a></h3>
+      <p>FineCausal targets two problems: AQA models act as black boxes, and they can pick up misleading cues like background or audience. A graph-attention module separates athlete features from background, and masked self-attention lets each dive stage attend only to earlier stages, so the weights show how one stage influences the next. On FineDiving-HM (3,000 videos), it reaches ρ = 0.9447 and relative ℓ2 = 0.2338, compared with 0.9435 and 0.2602 for the previous best. The gain in ρ is small, but the drop in score error is larger. It needs expert knowledge to define the causal structure, depends on costly labels, and was tested on one dataset. Running's chain of phases makes this kind of stage-to-stage modeling a promising fit.</p>
+    </article>
+
+    <article class="card" aria-labelledby="p5">
+      <h3 id="p5">[5] UIL-AQA for long videos (Dong et al., 2025) <a class="cite" href="bibliography.html#ref5">[5]</a></h3>
+      <p>Most AQA work uses clips of 5 to 10 seconds. This paper targets routines lasting minutes, where a single averaged score hides which parts went well. A transformer decoder turns clip features into per-clip representations, and a two-branch head gives each clip a difficulty weight and a quality score, so the final score is a weighted sum. The authors found that plain transformer decoders "skip" through long videos and weight every clip almost equally, so they added an attention loss, which raised ρ from 0.628 to 0.807 on its own. They also inject small random noise into predictions during training to imitate disagreement between judges. It reports the best ρ on all three long-video benchmarks, and in a small user study people agreed with its clip judgments 73% of the time. The temporal head is light (about 5.5M parameters) once features are extracted. Its fixed-length clips can cut across real movements, and the clip scores have not yet been checked by expert judges. For running, long multi-stride videos and subjective labels are exactly the problems this paper works on.</p>
+    </article>
+
+    <h2>What the results show, and what they do not</h2>
+    <p>Taken together, the four method papers point in the same direction, but only within their own benchmarks <a class="cite" href="bibliography.html#ref2">[2]</a>, <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>, <a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+    <div class="two-col">
+      <div class="callout good">
+        <span class="callout-title">Shows</span>
+        <ul>
+          <li>Parsing actions into phases and focusing on the athlete improves agreement with expert scores in diving.</li>
+          <li>Phase segmentation of a well-filmed, structured sport can be very accurate.</li>
+          <li>Combining appearance and body-structure inputs helped in cricket.</li>
+          <li>Per-phase, per-body-region, and per-clip outputs are possible, even for videos several minutes long.</li>
+        </ul>
+      </div>
+      <div class="callout warn">
+        <span class="callout-title">Does not show</span>
+        <ul>
+          <li>That any of these methods work on running video.</li>
+          <li>That they work from new camera angles or with everyday recording conditions.</li>
+          <li>That high correlation with judges means the feedback is useful to an athlete.</li>
+          <li>That results transfer between datasets. Each paper reports results within its own benchmark.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Applications</h2>
+    <p>The surveyed applications include judging support in competitive sports, coaching and training feedback, fitness, surgical skill assessment, and rehabilitation monitoring <a class="cite" href="bibliography.html#ref1">[1]</a>. For running, the most realistic near-term application is <strong>after-the-fact video review</strong>, where a system highlights phases and strides for a coach to examine. Fully automated scoring of running form is further away.</p>
+
+    <nav class="page-nav" aria-label="Page sequence">
+      <a href="action-quality.html">← 4. Fine-Grained Action-Quality Assessment</a>
+      <a href="challenges.html">Next: 6. Successes, Failures, and Challenges →</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div>CS 663 Project 1 Research Tutorial · Gary Wu · Researched and written by Gary Wu, with AI assistance in drafting, diagrams, and site code.</div>
+  </footer>
+</body>
+</html>

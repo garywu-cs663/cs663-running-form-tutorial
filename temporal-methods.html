@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3. Temporal Video-Understanding Methods | Temporal Understanding of Running Form</title>
+  <meta name="description" content="Temporal features, temporal action segmentation, TCNs, LSTMs, and video transformers, and a video-to-quality-score pipeline.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-title" href="index.html">Temporal Understanding of Running Form <span>CS 663 Research Tutorial · Gary Wu</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+    <nav id="site-nav" class="site-nav" aria-label="Tutorial pages">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="introduction.html">1. Problem</a></li>
+        <li><a href="movement-over-time.html">2. Movement Over Time</a></li>
+        <li><a href="temporal-methods.html" aria-current="page">3. Temporal Methods</a></li>
+        <li><a href="action-quality.html">4. Action Quality</a></li>
+        <li><a href="research.html">5. Research</a></li>
+        <li><a href="challenges.html">6. Challenges</a></li>
+        <li><a href="conclusion.html">7. Future &amp; Quiz</a></li>
+        <li><a href="bibliography.html">8. Bibliography</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">Section 3 · Main technical section</p>
+    <h1>Temporal Video-Understanding Methods</h1>
+    <p class="lead">This section explains how a model turns a stack of video frames into an understanding of movement over time, starting with segmentation, then three types of temporal models, and ending with one complete algorithm.</p>
+
+    <section class="narration" aria-labelledby="narration-heading">
+      <h2 id="narration-heading">Page narration</h2>
+      <audio controls preload="metadata" src="assets/audio/temporal-methods.mp3" data-narration-audio>
+        Your browser does not support the audio element. A text version of the narration is provided below.
+      </audio>
+      <p class="audio-status" data-audio-status hidden></p>
+      <div class="speech-controls">
+        <button type="button" data-speak>Listen to this page (browser voice)</button>
+        <button type="button" class="secondary" data-speak-stop disabled>Stop</button>
+      </div>
+      <p class="speech-note">The browser voice is a testing fallback that reads the script below. The recorded narration in the audio player is the official voice-over for this page.</p>
+      <details>
+        <summary>Read the narration script</summary>
+        <div data-narration-text>
+          <p>This is the main technical section. I start with how a video becomes a sequence of features, and then explain temporal action segmentation, which gives every time step a phase label.</p>
+          <p>Next I compare three families of temporal models. Temporal convolutional networks slide filters across time. They are fast and good with local patterns, but they see a fixed window. LSTMs carry a memory forward step by step, which gives them a natural sense of order, but they are slower and older information can fade. Transformers let every time step look at every other step. That helps with long-range relationships, but they cost more computation and usually need more data. The interactive explorer lets you pick a model and see which time steps influence an output.</p>
+          <p>The section ends with a pipeline from video frames to phases to a quality score, with pseudocode, assumptions, and operating conditions. This is a teaching design based on the papers, not a model trained by this website.</p>
+        </div>
+      </details>
+    </section>
+
+    <h2 id="features">3.1 From frames to temporal features</h2>
+    <p>A <strong>frame</strong> is one image, and on its own it only shows posture. Models usually group consecutive frames into short <strong>clips</strong>. FineCausal, for example, samples 96 frames from each dive and splits them into 9 clips of 16 frames. Each clip is passed through a backbone network, often a 3D convolutional network such as I3D, which turns it into a <strong>temporal feature</strong>: a vector that describes what is happening and how it is changing. Body-joint positions can be used as a second input. Longer videos work the same way: Dong et al.'s UIL-AQA splits gymnastics and skating routines that last a few minutes into fixed-length clips and runs a pretrained backbone on each one. Whatever the input, the result is a <em>sequence</em> of feature vectors, one per time step, and that sequence is what the temporal model works on <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>, <a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+
+    <h2 id="segmentation">3.2 Temporal action segmentation</h2>
+    <p><strong>Temporal action segmentation</strong> gives every time step a label. Consecutive steps with the same label form a <strong>segment</strong>, and the points where the label changes are <strong>boundaries</strong>. For running, the labels would be contact, stance, push-off, and swing.</p>
+
+    <figure>
+      <div class="diagram" role="img" aria-label="Segmentation timeline with four rows of sixteen cells. Row one lists frames f1 to f16. Row two shows raw frame-by-frame phase labels, with two flicker errors outlined in red: a push-off label inside stance and a stance label inside swing. Row three shows the labels after smoothing and the phase-order rule; the flicker is gone, but two cells outlined in red show boundaries that are one frame late. Row four shows the expert ground truth: swing, contact, stance, push-off, swing, then contact and stance again.">
+        <div class="dg-scroll">
+          <div class="dg-seg">
+            <span class="row-label">Frames</span>
+            <span class="c fr">1</span><span class="c fr">2</span><span class="c fr">3</span><span class="c fr">4</span><span class="c fr">5</span><span class="c fr">6</span><span class="c fr">7</span><span class="c fr">8</span><span class="c fr">9</span><span class="c fr">10</span><span class="c fr">11</span><span class="c fr">12</span><span class="c fr">13</span><span class="c fr">14</span><span class="c fr">15</span><span class="c fr">16</span>
+
+            <span class="row-label">Raw prediction</span>
+            <span class="c W">W</span><span class="c W">W</span><span class="c W">W</span><span class="c C">C</span><span class="c S">S</span><span class="c S">S</span><span class="c P err">P</span><span class="c S">S</span><span class="c P">P</span><span class="c W">W</span><span class="c W">W</span><span class="c S err">S</span><span class="c W">W</span><span class="c W">W</span><span class="c C">C</span><span class="c S">S</span>
+
+            <span class="row-label">After cleanup</span>
+            <span class="c W">W</span><span class="c W">W</span><span class="c W err">W</span><span class="c C">C</span><span class="c S">S</span><span class="c S">S</span><span class="c S">S</span><span class="c S err">S</span><span class="c P">P</span><span class="c W">W</span><span class="c W">W</span><span class="c W">W</span><span class="c W">W</span><span class="c W">W</span><span class="c C">C</span><span class="c S">S</span>
+
+            <span class="row-label">Ground truth</span>
+            <span class="c W">W</span><span class="c W">W</span><span class="c C">C</span><span class="c S">S</span><span class="c S">S</span><span class="c S">S</span><span class="c S">S</span><span class="c P">P</span><span class="c P">P</span><span class="c W">W</span><span class="c W">W</span><span class="c W">W</span><span class="c W">W</span><span class="c W">W</span><span class="c C">C</span><span class="c S">S</span>
+          </div>
+        </div>
+        <p class="dg-note">C = contact, S = stance, P = push-off, W = swing. Red outline = error compared with ground truth.</p>
+      </div>
+      <figcaption>
+        <span class="fig-label">Figure 3.</span> Temporal action segmentation. Raw frame-by-frame labels flicker. Cleaning them up with smoothing and the phase-order rule removes the flicker, but the contact and push-off boundaries still start one frame late.
+        <span class="source-note">Source: Diagram by Gary Wu, made with AI assistance. Example labels are made up for illustration, not output from a real model.</span>
+      </figcaption>
+    </figure>
+
+    <p>The figure shows the two main kinds of error. <strong>Flicker</strong> is a stray label in the middle of a segment, which creates a fake phase. <strong>Boundary drift</strong> is when the phases are in the right order but start a frame or two early or late. Drift sounds minor, but initial contact may only last a few frames, so a one-frame shift can change the measured timing a lot. The temporal models below exist mostly to reduce these errors by giving each time step context from its neighbors.</p>
+
+    <h2 id="models">3.3 Three ways to model time</h2>
+    <p>A <strong>temporal convolutional network (TCN)</strong> slides a filter along the time axis, so each output is computed from a small window of nearby steps. Stacking layers with <strong>dilation</strong> (skipping every 2nd step, then every 4th, and so on) widens that window quickly. TCNs process every step in parallel, so they are fast and fairly easy to train, and they are good at short events like the few frames around a foot contact. The catch is that the window size is fixed. Anything outside it, such as a stride from ten seconds earlier, has no effect.</p>
+    <p>An <strong>LSTM</strong> (long short-term memory network) reads the sequence one step at a time and keeps a <strong>hidden state</strong>, a running summary of what it has seen so far. Gates decide what to keep and what to forget. This gives it a built-in sense of order. The cricket study uses LSTMs both to encode body-joint sequences and to combine features over time before scoring <a class="cite" href="bibliography.html#ref3">[3]</a>. The downsides are speed, since steps are processed one after another, and memory that fades over long sequences. A standard LSTM also can't use future frames unless a second LSTM reads the sequence backward.</p>
+    <p>A <strong>transformer</strong> uses <strong>self-attention</strong>: every time step weighs how relevant every other step is, so a moment in stride 10 can directly "look at" stride 2. Attention can also be restricted. FineCausal masks it so that each stage of a dive only attends to earlier stages, which matches the idea that earlier stages affect later ones and not the reverse <a class="cite" href="bibliography.html#ref4">[4]</a>. Transformers are the best of the three at long-range links, but comparing every pair of steps gets expensive as videos get longer, and they usually need more training data. They can also fail in less obvious ways. On routines lasting several minutes, Dong et al. found that a plain transformer decoder tended to "skip" over parts of the video and give every clip nearly the same weight, and they needed an extra training loss to fix it. Yin et al.'s survey traces how all three families have been used in action-quality work <a class="cite" href="bibliography.html#ref1">[1]</a>, <a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+
+    <figure>
+      <div class="diagram" role="img" aria-label="Three-column comparison. Each column has a strip of twelve time steps showing which steps affect the output at step 8. TCN: only a fixed window of nearby steps, 5 through 11; good at short local events and fast; weak at long-range links. LSTM or RNN: all earlier steps, with older steps fading, and no future steps; good at keeping order; slower and older memory fades. Transformer: all twelve steps; good at long-range links between strides; costly for long videos and needs more data.">
+        <div class="dg-cols">
+          <div class="dg-box">
+            <h4>TCN</h4>
+            <div class="dg-dots"><i></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="out"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+            <dl>
+              <dt>Sees time as</dt><dd>a fixed window of nearby steps</dd>
+              <dt>Good at</dt><dd>short local events; fast, parallel training</dd>
+              <dt>Weak at</dt><dd>anything outside the window</dd>
+              <dt>Running use</dt><dd>finding contact and push-off boundaries</dd>
+            </dl>
+          </div>
+          <div class="dg-box">
+            <h4>LSTM / RNN</h4>
+            <div class="dg-dots"><i class="weak"></i><i class="weak"></i><i class="weak"></i><i class="weak"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="out"></i><i></i><i></i><i></i><i></i></div>
+            <dl>
+              <dt>Sees time as</dt><dd>a memory passed forward step by step</dd>
+              <dt>Good at</dt><dd>keeping order; small data, short clips</dd>
+              <dt>Weak at</dt><dd>speed; old information fades</dd>
+              <dt>Running use</dt><dd>following phases within a few strides</dd>
+            </dl>
+          </div>
+          <div class="dg-box">
+            <h4>Video transformer</h4>
+            <div class="dg-dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="out"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+            <dl>
+              <dt>Sees time as</dt><dd>every step attending to every other step</dd>
+              <dt>Good at</dt><dd>long-range links between strides</dd>
+              <dt>Weak at</dt><dd>cost on long videos; needs more data</dd>
+              <dt>Running use</dt><dd>comparing strides across a whole run</dd>
+            </dl>
+          </div>
+        </div>
+        <p class="dg-note">Dot strips: dark = output step, blue = used, pale = used but fading, white = not used.</p>
+      </div>
+      <figcaption>
+        <span class="fig-label">Figure 4.</span> How TCNs, LSTMs/RNNs, and video transformers use time. Each strip shows which of twelve time steps can affect the output at step 8.
+        <span class="source-note">Source: Diagram by Gary Wu, made with AI assistance. General model concepts as reviewed in Yin et al. [1]; simplified, not a specific published architecture.</span>
+      </figcaption>
+    </figure>
+
+    <section class="widget" aria-labelledby="explorer-heading">
+      <h3 id="explorer-heading">Interactive: which time steps does the model use?</h3>
+      <p>Choose a model, then select a time step. Highlighted steps are the ones that influence the selected output.</p>
+      <div class="model-buttons" role="group" aria-label="Choose a temporal model">
+        <button type="button" class="seg-btn" data-model="tcn" aria-pressed="true">TCN</button>
+        <button type="button" class="seg-btn" data-model="lstm" aria-pressed="false">LSTM</button>
+        <button type="button" class="seg-btn" data-model="transformer" aria-pressed="false">Transformer</button>
+      </div>
+      <div class="timestep-row" id="timestep-row" role="group" aria-label="Time steps t1 to t12. Select one to make it the output step."></div>
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:#083a66"></i>selected output step</span>
+        <span><i style="background:#9cc9f0"></i>strongly used</span>
+        <span><i style="background:#dcecf9"></i>weakly used (fading memory)</span>
+        <span><i style="background:#fff"></i>not used</span>
+      </div>
+      <p id="model-explain" aria-live="polite" style="margin-bottom:0"></p>
+      <p class="meta">Simplified illustration of context, not an exact simulation. Widget by Gary Wu, built with AI assistance.</p>
+    </section>
+
+    <!-- DRAFT OPINION: Gary, confirm or edit this section so it reflects your own view. -->
+    <h3 id="which-model">Which approach should you use?</h3>
+    <p>From what I read, there isn't a single winner. Running has structure at two time scales: inside one stride, where contact leads into stance and push-off in a fraction of a second, and across many strides, where left-right balance or fatigue slowly changes. A TCN fits the first scale best, since those events are short and local and a TCN is fast to train on a small dataset. An LSTM makes sense for short sequences with limited data, which is how the cricket study used one. A transformer is the better option for relating phases or strides to each other, as FineCausal does with dive stages, but only with enough data and computing power. For running, I would lean toward a hybrid: a TCN to find phases inside each stride, then a small transformer comparing per-stride summaries. That keeps attention cheap because it runs over a handful of strides instead of hundreds of frames. This is my own reasoning from the papers, not something any of them tested on running <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+
+    <h2 id="algorithm">3.4 Detailed algorithm: from video frames to a quality score</h2>
+    <p>This pipeline brings the pieces together. It is a <strong>teaching design</strong> that combines patterns shared by the papers in Section 5, such as clip-level backbones, parsing actions into stages, phase-level scoring, and training on several tasks at once. This website does not train or run it <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>, <a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+
+    <figure>
+      <div class="diagram" role="img" aria-label="Pipeline of five boxes connected by arrows. One, video input: frames of the runner, cropped. Two, temporal features: a backbone turns short clips into feature vectors. Three, model processing: a TCN, LSTM, or transformer adds context across time. Four, movement phases: contact, stance, push-off, and swing with start and end times. Five, quality feedback: phase scores, an overall score, and feedback with confidence.">
+        <div class="dg-flow">
+          <div class="dg-box"><h4>1. Video input</h4><p>Frames of the runner, sampled and cropped</p></div>
+          <span class="dg-arrow" aria-hidden="true">→</span>
+          <div class="dg-box"><h4>2. Temporal features</h4><p>Backbone turns short clips into feature vectors</p></div>
+          <span class="dg-arrow" aria-hidden="true">→</span>
+          <div class="dg-box"><h4>3. Model processing</h4><p>TCN, LSTM, or transformer adds context over time</p></div>
+          <span class="dg-arrow" aria-hidden="true">→</span>
+          <div class="dg-box"><h4>4. Movement phases</h4><p>Contact, stance, push-off, swing, with start and end times</p></div>
+          <span class="dg-arrow" aria-hidden="true">→</span>
+          <div class="dg-box fill"><h4>5. Quality feedback</h4><p>Phase scores, overall score, feedback with confidence</p></div>
+        </div>
+      </div>
+      <figcaption>
+        <span class="fig-label">Figure 5.</span> Video-to-feedback pipeline. Each stage turns the video into a more abstract description of the movement, ending with phase-level scores and feedback.
+        <span class="source-note">Source: Diagram by Gary Wu, made with AI assistance. Based on the general design shared by Moodley and van der Haar [3], Han et al. [4], and Dong et al. [5]. Not a trained system.</span>
+      </figcaption>
+    </figure>
+
+    <p><strong>Input.</strong> A video of one runner at a known frame rate.</p>
+    <p><strong>Processing.</strong> First, frames are sampled and cropped around the runner, which cuts down on background distraction, the same reason diving research uses athlete masks <a class="cite" href="bibliography.html#ref2">[2]</a>. Second, a backbone turns each short clip into a feature vector, and a body-structure stream can optionally be fused in. Third, a temporal model adds context so each step "knows" what came before. Fourth, a phase head and a boundary head label each step, and a decoder applies the fixed phase order to produce clean segments with start and end times. Finally, features are averaged within each segment and a quality head predicts a score and a confidence value for each phase.</p>
+    <p><strong>Output.</strong> Phase segments with timestamps, a score per phase, an overall score, and short feedback flags such as "left push-off was slower than your other strides," shown only when confidence is high. The output describes movement patterns.</p>
+
+<pre><code># Teaching pseudocode only. This is not a trained or validated model.
+frames   = crop_to_runner(sample(video, fps))
+clips    = sliding_windows(frames, length = 16)
+X        = [backbone(c) for c in clips]            # one feature vector per clip
+H        = temporal_model(X)                       # TCN, LSTM, or transformer
+
+phase_p  = softmax(phase_head(H))                  # phase probabilities per step
+trans_p  = sigmoid(transition_head(H))             # boundary probability per step
+segments = decode(phase_p, trans_p, order = [contact, stance, push_off, swing])
+
+for each segment k:
+    q_k, conf_k = quality_head(mean(H[segment k])) # phase score and confidence
+
+overall  = combine(q_1 ... q_K)
+feedback = describe(segments, q, conf, min_conf = threshold)
+
+# Training needs expert labels for phases AND quality:
+loss = L_phase + L_transition + L_score</code></pre>
+    <p>The training loss follows a common multi-task design. FineCausal, for example, adds a spatial-parsing loss, a temporal-parsing loss, and a score loss <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+
+    <h3>Assumptions and operating conditions</h3>
+    <ul>
+      <li>One runner stays in view for several strides, filmed by a stable camera, ideally from the side.</li>
+      <li>The frame rate is high enough that short phases, especially contact, span more than one or two frames.</li>
+      <li>Lighting is reasonable, and the background doesn't hide the legs.</li>
+      <li>Expert labels exist for both phase boundaries and quality, under a written rubric.</li>
+      <li>Test videos look like the training videos in camera angle, setting, and type of runner.</li>
+      <li>Live feedback requires enough computing power. Otherwise, analysis happens after recording.</li>
+    </ul>
+    <p>When these conditions don't hold, performance can drop sharply. Section 6 covers each failure mode.</p>
+
+    <nav class="page-nav" aria-label="Page sequence">
+      <a href="movement-over-time.html">← 2. Understanding Athletic Movement Over Time</a>
+      <a href="action-quality.html">Next: 4. Fine-Grained Action-Quality Assessment →</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div>CS 663 Project 1 Research Tutorial · Gary Wu · Researched and written by Gary Wu, with AI assistance in drafting, diagrams, and site code.</div>
+  </footer>
+</body>
+</html>

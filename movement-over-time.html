@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2. Understanding Athletic Movement Over Time | Temporal Understanding of Running Form</title>
+  <meta name="description" content="Running phases, timing, sequence order, and how computer-vision systems find the beginnings, transitions, and endings of movement phases.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-title" href="index.html">Temporal Understanding of Running Form <span>CS 663 Research Tutorial · Gary Wu</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+    <nav id="site-nav" class="site-nav" aria-label="Tutorial pages">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="introduction.html">1. Problem</a></li>
+        <li><a href="movement-over-time.html" aria-current="page">2. Movement Over Time</a></li>
+        <li><a href="temporal-methods.html">3. Temporal Methods</a></li>
+        <li><a href="action-quality.html">4. Action Quality</a></li>
+        <li><a href="research.html">5. Research</a></li>
+        <li><a href="challenges.html">6. Challenges</a></li>
+        <li><a href="conclusion.html">7. Future &amp; Quiz</a></li>
+        <li><a href="bibliography.html">8. Bibliography</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">Section 2</p>
+    <h1>Understanding Athletic Movement Over Time</h1>
+    <p class="lead">Running is a repeating cycle of phases that always happen in the same order. This page breaks down that cycle and shows why its timing matters for computer vision.</p>
+
+    <section class="narration" aria-labelledby="narration-heading">
+      <h2 id="narration-heading">Page narration</h2>
+      <audio controls preload="metadata" src="assets/audio/movement-over-time.mp3" data-narration-audio>
+        Your browser does not support the audio element. A text version of the narration is provided below.
+      </audio>
+      <p class="audio-status" data-audio-status hidden></p>
+      <div class="speech-controls">
+        <button type="button" data-speak>Listen to this page (browser voice)</button>
+        <button type="button" class="secondary" data-speak-stop disabled>Stop</button>
+      </div>
+      <p class="speech-note">The browser voice is a testing fallback that reads the script below. The recorded narration in the audio player is the official voice-over for this page.</p>
+      <details>
+        <summary>Read the narration script</summary>
+        <div data-narration-text>
+          <p>This section looks at running as a movement that unfolds over time. A running stride repeats a set of phases: initial contact, when the foot lands; stance, when the body passes over the foot; push-off, when the foot leaves the ground; and swing, when the leg recovers forward. Running also has flight periods, when neither foot is touching the ground.</p>
+          <p>These phases always happen in the same order, and their timing changes with speed and from runner to runner. Two runners can look nearly identical in one frame but move very differently across the whole stride. For example, one might stay on the ground much longer than the other.</p>
+          <p>Computer-vision systems handle this by labeling every moment of the video with a phase and finding the boundaries where one phase turns into the next. Try the interactive timeline on this page. Move the slider through a stride and compare what one frame shows with what the full sequence reveals.</p>
+        </div>
+      </details>
+    </section>
+
+    <h2>The phases of a running stride</h2>
+    <p>A <strong>stride</strong> is one full cycle of a single leg, from when one foot touches the ground until that same foot lands again. It starts with <strong>initial contact</strong>, the brief moment the foot lands. Next is <strong>stance</strong>, where the body absorbs the landing and moves over the foot. Stance ends with <strong>push-off</strong>, when the leg extends and the foot leaves the ground. Finally, in <strong>swing</strong>, the leg travels forward for the next contact. Part of swing overlaps with <strong>flight</strong>, when neither foot is touching the ground. Flight is one of the clearest differences between running and walking, since walking always has a moment with both feet down.</p>
+
+    <figure>
+      <div class="diagram" role="img" aria-label="Horizontal timeline of one stride for one leg, from 0 to 100 percent. It is divided into four labeled segments in order: contact, stance, push-off, and swing. A note explains that flight, when neither foot touches the ground, happens during the early part of swing. Proportions are illustrative.">
+        <p class="dg-heading">One stride of the right leg (illustrative proportions)</p>
+        <div class="phase-bar">
+          <span class="phase-contact" style="width:8%">C</span>
+          <span class="phase-stance" style="width:24%">Stance</span>
+          <span class="phase-pushoff" style="width:10%">Push-off</span>
+          <span class="phase-swing" style="width:58%">Swing</span>
+        </div>
+        <div class="dg-timeline-axis"><span>0%</span><span>50%</span><span>100% (next contact)</span></div>
+        <p class="dg-flight"><strong>C</strong> = initial contact. <strong>Flight</strong> (neither foot on the ground) happens right after push-off, during early swing, before the other foot lands.</p>
+      </div>
+      <figcaption>
+        <span class="fig-label">Figure 2.</span> Running-cycle timeline. The four phases always happen in this order. The widths are only illustrative, since real phase lengths change with speed and from runner to runner.
+        <span class="source-note">Source: Diagram by Gary Wu, made with AI assistance.</span>
+      </figcaption>
+    </figure>
+
+    <section class="widget" aria-labelledby="timeline-heading">
+      <h3 id="timeline-heading">Interactive: move through one stride</h3>
+      <p>Drag the slider, or focus it and use the arrow keys, to move through one right-leg stride. For each phase, compare what one frame can show with what the sequence reveals.</p>
+      <div class="phase-bar" id="cycle-bar" aria-hidden="true">
+        <span class="phase-contact" data-phase="contact" style="width:6%">C</span>
+        <span class="phase-stance" data-phase="stance" style="width:24%">Stance</span>
+        <span class="phase-pushoff" data-phase="pushoff" style="width:10%">Push</span>
+        <span class="phase-swing" data-phase="swing" style="width:60%">Swing (incl. flight)</span>
+      </div>
+      <label for="cycle-slider">Position in stride: <strong id="cycle-pct">0%</strong></label>
+      <input id="cycle-slider" class="timeline-slider" type="range" min="0" max="99" step="1" value="15">
+      <div class="timeline-output" aria-live="polite">
+        <h4 id="cycle-phase-name">Stance (loading and midstance)</h4>
+        <p id="cycle-body"></p>
+        <p><strong>One frame shows:</strong> <span id="cycle-frame"></span></p>
+        <p><strong>The sequence adds:</strong> <span id="cycle-sequence"></span></p>
+        <p><strong>What a temporal model looks for:</strong> <span id="cycle-model"></span></p>
+      </div>
+      <p class="meta">Phase proportions in this widget are illustrative only. Widget by Gary Wu, built with AI assistance.</p>
+    </section>
+
+    <h2>How timing and order affect analysis</h2>
+    <p>Phases give a model two kinds of information it can't get from a single frame. The first is <strong>duration</strong>, how long each phase lasts compared to the rest of the stride. Changes in speed or fatigue usually show up here first. The second is <strong>order</strong>. Because the phases always happen in the same sequence, a model can use that order as a rule. If it predicts push-off right after contact with no stance in between, something has gone wrong.</p>
+    <p>Research in other sports uses the same idea. Moodley and van der Haar split every cricket stroke into buildup, execution, and follow-through, and Han et al. divide each dive into ordered stages and model how one affects the next. Running fits this structure well and has one extra advantage: the cycle repeats, so one video can contain dozens of strides to compare <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+
+    <p>Here is a concrete example. Imagine two runners photographed at midstance with nearly identical posture. Over the full stride, though, they differ:</p>
+    <div class="table-wrap" role="region" aria-label="Two runners compared" tabindex="0">
+      <table>
+        <caption>Same frame, different movement (hypothetical example)</caption>
+        <thead>
+          <tr><th scope="col">Property</th><th scope="col">Runner A</th><th scope="col">Runner B</th><th scope="col">Visible in one frame?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Posture at midstance</td><td>Upright, slight lean</td><td>Upright, slight lean</td><td>Yes (identical)</td></tr>
+          <tr><td>Time spent in stance</td><td>Short</td><td>Noticeably longer</td><td>No</td></tr>
+          <tr><td>Push-off transition</td><td>Quick, smooth</td><td>Gradual</td><td>No</td></tr>
+          <tr><td>Left/right consistency</td><td>Even</td><td>One side differs</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>A frame-based model would describe both runners the same way, while a temporal model can tell them apart. Yin et al. point out the same problem more broadly: one action can be performed in many styles and at different speeds, which makes it hard to model with a single template <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+
+    <h2>Finding phases in a video</h2>
+    <p>Before a system can use phases, it has to find them. The model gives every frame a probability for each phase, some models also predict where boundaries fall, and the raw labels are cleaned up into segments with start and end times. On a well-filmed diving benchmark, this works very well, with an average overlap with the true stages of about 0.99. Once a running video is split this way, a system can measure each phase, compare strides, and tie feedback to a moment, like "the left push-off was slower than the right." Section 3 explains how the models do this, and Section 6 explains why the diving result may not carry over to everyday running video <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+
+    <nav class="page-nav" aria-label="Page sequence">
+      <a href="introduction.html">← 1. Introduction and Problem Definition</a>
+      <a href="temporal-methods.html">Next: 3. Temporal Video-Understanding Methods →</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div>CS 663 Project 1 Research Tutorial · Gary Wu · Researched and written by Gary Wu, with AI assistance in drafting, diagrams, and site code.</div>
+  </footer>
+</body>
+</html>

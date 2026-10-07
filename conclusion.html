@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>7. Future Applications, Quiz, and Conclusion | Temporal Understanding of Running Form</title>
+  <meta name="description" content="Future applications of temporal action-quality assessment for running, a three-question knowledge check, and the tutorial's conclusion.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/quiz.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-title" href="index.html">Temporal Understanding of Running Form <span>CS 663 Research Tutorial · Gary Wu</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+    <nav id="site-nav" class="site-nav" aria-label="Tutorial pages">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="introduction.html">1. Problem</a></li>
+        <li><a href="movement-over-time.html">2. Movement Over Time</a></li>
+        <li><a href="temporal-methods.html">3. Temporal Methods</a></li>
+        <li><a href="action-quality.html">4. Action Quality</a></li>
+        <li><a href="research.html">5. Research</a></li>
+        <li><a href="challenges.html">6. Challenges</a></li>
+        <li><a href="conclusion.html" aria-current="page">7. Future &amp; Quiz</a></li>
+        <li><a href="bibliography.html">8. Bibliography</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">Section 7</p>
+    <h1>Future Applications and Conclusion</h1>
+    <p class="lead">This last section looks at where this research could go next, gives you a short quiz to check what you learned, and then comes back to the research question from the start of the tutorial.</p>
+
+    <section class="narration" aria-labelledby="narration-heading">
+      <h2 id="narration-heading">Page narration</h2>
+      <audio controls preload="metadata" src="assets/audio/conclusion.mp3" data-narration-audio>
+        Your browser does not support the audio element. A text version of the narration is provided below.
+      </audio>
+      <p class="audio-status" data-audio-status hidden></p>
+      <div class="speech-controls">
+        <button type="button" data-speak>Listen to this page (browser voice)</button>
+        <button type="button" class="secondary" data-speak-stop disabled>Stop</button>
+      </div>
+      <p class="speech-note">The browser voice is a testing fallback that reads the script below. The recorded narration in the audio player is the official voice-over for this page.</p>
+      <details>
+        <summary>Read the narration script</summary>
+        <div data-narration-text>
+          <p>In this final section I look ahead and then return to my thesis. Temporal methods could support personalized running feedback, coaching, athlete training, and, with a professional involved, rehabilitation support. Getting there will take more diverse datasets, systems that explain their feedback, faster processing, and possibly combining video with other signals such as audio.</p>
+          <p>Before the conclusion there is a three-question quiz with immediate feedback, so you can check your understanding.</p>
+          <p>My conclusion is that current systems can split structured movements into phases and predict scores that agree closely with expert judges on benchmark datasets. What they can't do yet is give reliable running-form feedback for any runner, from any camera, without carefully defined labels. Temporal understanding is a real step forward, but it is not a finished solution.</p>
+        </div>
+      </details>
+    </section>
+
+    <h2>Future applications</h2>
+    <p>The most obvious use is <strong>personalized running feedback</strong>. A runner records a short video, the system splits it into strides and phases, and it points out where one side or one phase looks different. Because running repeats, a system could compare a runner against their own earlier strides instead of one "ideal" runner. Given how subjective good form is, I think that comparison is easier to defend than a universal standard.</p>
+    <p>For <strong>coaching</strong>, the realistic near-term role is a review tool that finds the strides worth looking at and leaves the judgment to the coach. That plays to what the models are good at (segmentation and consistent measurement) and avoids what they are weak at (deciding what "good" means). <strong>Rehabilitation support</strong> is another direction the survey mentions, but here I want to be careful: a system could help a physical therapist track movement over time, but it should not diagnose anything, and none of these papers validate their methods for medical use. <strong>Real-time feedback</strong> during a run is further off, since the most accurate models are still heavy <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+
+    <h2>What the research needs next</h2>
+    <p>The first need is <strong>more diverse datasets</strong>: recreational and elite runners, different ages, bodies, speeds, surfaces, and camera angles, with poor strides labeled on purpose so they don't get overestimated. The second is <strong>more interpretable systems</strong>. Yin et al. point to causal reasoning as one route, and FineCausal is an early example. For running, that would mean feedback naming a phase, a body region, and a confidence level. The third is <strong>combining visual, audio, and temporal information</strong>. Multimodal AQA is one of the main trends in the survey. Footstep sounds might help find contact moments when the foot is hidden, although that's my own suggestion and none of the reviewed papers test it <a class="cite" href="bibliography.html#ref1">[1]</a>, <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+
+    <h3>Who is working on this</h3>
+    <p>Based on the author affiliations in the papers, groups working on fine-grained AQA include Yuxin Peng's group at Peking University, Dustin van der Haar's group at the University of Johannesburg, Hubert P. H. Shum's group at Durham University, Andrew Gilbert's group at the University of Surrey, and the survey team at the University of Science and Technology of China, the Chinese Academy of Sciences' Suzhou Institute of Biomedical Engineering and Technology, and A*STAR in Singapore <a class="cite" href="bibliography.html#ref1">[1]</a>–<a class="cite" href="bibliography.html#ref5">[5]</a>.</p>
+
+    <h2 id="quiz-section">Check your understanding</h2>
+    <p>This three-question quiz covers the main ideas from the tutorial. Pick an answer to get immediate feedback with an explanation. Your score appears once you finish, and you can reset to try again.</p>
+    <div id="quiz">
+      <noscript><p class="callout warn">The quiz needs JavaScript. Please enable it to take the quiz.</p></noscript>
+    </div>
+    <p id="quiz-score" class="quiz-score" aria-live="polite"></p>
+    <button type="button" id="quiz-reset" class="btn secondary">Reset quiz</button>
+
+    <h2>Conclusion</h2>
+    <p>At the start of this tutorial I asked how computer-vision systems can use the timing, order, and phases of movement to evaluate running form better than analyzing individual frames. Based on the papers I reviewed, the answer has three parts. Temporal models give each moment context from the moments around it. Segmenting a movement into ordered phases lets a system measure timing and judge each phase separately. And fine-grained action-quality assessment turns those phases into scores and, increasingly, into feedback about where and when a movement went wrong.</p>
+    <p>That supports my thesis, but only partly. On structured, well-filmed diving and cricket benchmarks, current systems segment phases very accurately and rank performances in close agreement with expert judges. But no method reviewed here has been shown to work on running video, from any camera angle, for runners unlike those in its training data. Their scores are only as good as their labels, their explanations are still partial, and the most accurate models are too slow for live feedback <a class="cite" href="bibliography.html#ref3">[3]</a>, <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+    <p>So my overall view is that temporal understanding is the right direction for running-form analysis, and it is clearly better than looking at frames one at a time. But for now it works best as a tool that helps a coach or runner see their own movement more clearly, not as a replacement for their judgment.</p>
+
+    <nav class="page-nav" aria-label="Page sequence">
+      <a href="challenges.html">← 6. Successes, Failures, and Challenges</a>
+      <a href="bibliography.html">Next: 8. Annotated Bibliography →</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div>CS 663 Project 1 Research Tutorial · Gary Wu · Researched and written by Gary Wu, with AI assistance in drafting, diagrams, and site code.</div>
+  </footer>
+</body>
+</html>

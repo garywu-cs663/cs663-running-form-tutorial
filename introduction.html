@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1. Introduction and Problem Definition | Temporal Understanding of Running Form</title>
+  <meta name="description" content="What running-form analysis means, why a single image is not enough, and how action-quality assessment differs from action recognition.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="site-title" href="index.html">Temporal Understanding of Running Form <span>CS 663 Research Tutorial · Gary Wu</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    </div>
+    <nav id="site-nav" class="site-nav" aria-label="Tutorial pages">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="introduction.html" aria-current="page">1. Problem</a></li>
+        <li><a href="movement-over-time.html">2. Movement Over Time</a></li>
+        <li><a href="temporal-methods.html">3. Temporal Methods</a></li>
+        <li><a href="action-quality.html">4. Action Quality</a></li>
+        <li><a href="research.html">5. Research</a></li>
+        <li><a href="challenges.html">6. Challenges</a></li>
+        <li><a href="conclusion.html">7. Future &amp; Quiz</a></li>
+        <li><a href="bibliography.html">8. Bibliography</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <p class="eyebrow">Section 1</p>
+    <h1>Introduction and Problem Definition</h1>
+    <p class="lead">Before looking at models, we need a clear definition of the problem: what does it mean to "analyze running form," and why does that require video rather than a photo?</p>
+
+    <section class="narration" aria-labelledby="narration-heading">
+      <h2 id="narration-heading">Page narration</h2>
+      <audio controls preload="metadata" src="assets/audio/introduction.mp3" data-narration-audio>
+        Your browser does not support the audio element. A text version of the narration is provided below.
+      </audio>
+      <p class="audio-status" data-audio-status hidden></p>
+      <div class="speech-controls">
+        <button type="button" data-speak>Listen to this page (browser voice)</button>
+        <button type="button" class="secondary" data-speak-stop disabled>Stop</button>
+      </div>
+      <p class="speech-note">The browser voice is a testing fallback that reads the script below. The recorded narration in the audio player is the official voice-over for this page.</p>
+      <details>
+        <summary>Read the narration script</summary>
+        <div data-narration-text>
+          <p>In this section I define the problem. Running-form analysis means describing how a person runs: their posture, how their limbs move, and the timing and rhythm of each stride. A single image can show posture, but it cannot show timing. The same knee angle might appear early in stance or late in swing, and one frame can't tell you how long the foot stayed on the ground. That is why this tutorial focuses on video.</p>
+          <p>I also separate two tasks. Action recognition asks what action is happening, for example running versus walking. Action-quality assessment asks how well the action is performed. Quality assessment is harder because the differences between a good and a weaker performance are often small and can happen at any point in the sequence.</p>
+          <p>Finally, I explain the scope. This tutorial is about research methods for temporal video understanding and quality assessment. It is not a review of software tools, and it does not cover force, pressure, or balance estimation.</p>
+        </div>
+      </details>
+    </section>
+
+    <h2>What running-form analysis means</h2>
+    <p>Running form is the way a person moves while they run. Coaches look at posture, where the foot lands compared to the body, knee bend, and arm swing. They also pay attention to timing, such as how long the foot stays on the ground and whether the left and right strides match. In computer vision, running-form analysis means turning a video of a runner into a description of these patterns, and ideally into feedback the runner can use.</p>
+
+    <h2>Why a single image is not enough</h2>
+    <p>The problem is that most of these patterns only exist over time. A single image can show a knee angle, but not which part of the stride you are looking at. A bent knee with the foot near the ground could be the start of stance or the end of swing. One frame also can't show how long a phase lasted or whether a joint is bending or straightening. Two runners can look almost identical in one photo and still move very differently over the whole stride, which is why this tutorial focuses on video.</p>
+
+    <figure>
+      <div class="diagram" role="img" aria-label="Two-panel diagram. Left panel: one frame, which shows posture at one instant but cannot show the phase, how long it lasts, or what comes before and after. Right panel: six frames in time order labeled contact, loading, midstance, push-off, flight, and late swing, which add phase order, phase duration, transitions, and stride-to-stride rhythm.">
+        <div class="dg-two">
+          <div>
+            <p class="dg-heading">One frame</p>
+            <div class="dg-frame single">frame <em>t</em><br>(posture only)</div>
+            <div class="dg-box">
+              <p><strong>Shows:</strong> posture at one instant.</p>
+              <p><strong>Missing:</strong> which phase, how long it lasts, what happens before and after.</p>
+            </div>
+          </div>
+          <div>
+            <p class="dg-heading">A sequence of frames</p>
+            <div class="dg-strip">
+              <div class="dg-frame">Contact</div>
+              <div class="dg-frame">Loading</div>
+              <div class="dg-frame">Midstance</div>
+              <div class="dg-frame">Push-off</div>
+              <div class="dg-frame">Flight</div>
+              <div class="dg-frame">Late swing</div>
+            </div>
+            <div class="dg-time">time →</div>
+            <div class="dg-box fill">
+              <p><strong>Adds:</strong> the order of phases, how long each phase lasts, where transitions happen, and stride-to-stride rhythm.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>
+        <span class="fig-label">Figure 1.</span> One frame versus a full sequence. A single frame only shows posture at one moment, while a sequence shows the timing information that running form depends on.
+        <span class="source-note">Source: Diagram by Gary Wu, made with AI assistance.</span>
+      </figcaption>
+    </figure>
+
+    <h2>Action recognition versus action-quality assessment</h2>
+    <p>It is also important to separate two tasks that often get mixed together. Action recognition asks "what is this person doing?", for example running instead of walking. Action-quality assessment (AQA) asks a harder question: "how well is this person doing it?" Instead of a class label, an AQA system outputs a score, a quality category, or feedback, and the differences it has to detect are much smaller <a class="cite" href="bibliography.html#ref1">[1]</a>.</p>
+
+    <div class="table-wrap" role="region" aria-label="Recognition versus quality assessment" tabindex="0">
+      <table>
+        <caption>Comparing the two tasks</caption>
+        <thead>
+          <tr><th scope="col"></th><th scope="col">Action recognition</th><th scope="col">Action-quality assessment</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Question</th><td>What action is this? (running, walking, jumping)</td><td>How well was the action performed?</td></tr>
+          <tr><th scope="row">Typical output</th><td>A class label</td><td>A score, a quality category, a ranking, or feedback</td></tr>
+          <tr><th scope="row">Differences to detect</th><td>Often large (running versus swimming)</td><td>Often subtle (two runs that look almost the same)</td></tr>
+          <tr><th scope="row">How much of the video is needed</th><td>Sometimes only a few frames</td><td>Usually the whole sequence, because an error can happen at any moment</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Why timing and movement order matter</h2>
+    <p>Recent research gives two reasons why AQA needs the full sequence. Xu et al. argue that models which learn one summary of a whole video miss the small details judges care about, so the action should be broken down in time and space before scoring. In their experiments, removing the step that splits a dive into stages over time hurt accuracy more than removing any other part of the model. Moodley and van der Haar point out that recognition can sometimes work from a few frames, but quality assessment can't, because a mistake can happen at any point <a class="cite" href="bibliography.html#ref2">[2]</a>, <a class="cite" href="bibliography.html#ref3">[3]</a>.</p>
+    <p>Order matters too. Each phase of a stride sets up the next, so a problem early on can show up later. Han et al. show this in diving, where an early mistake carries through the rest of the dive. A model that looks at frames one at a time can't capture that kind of chain <a class="cite" href="bibliography.html#ref4">[4]</a>.</p>
+
+    <h2>Scope of this tutorial</h2>
+    <p>This tutorial covers research methods for understanding movement over time: temporal segmentation, temporal models, and fine-grained action-quality assessment. Some papers use body keypoints as input, but I treat keypoints as just one way to represent a video. I won't review software tools or pose-estimation products, and I won't cover foot pressure, balance, or force estimation. Nothing here is medical advice, and none of these systems can diagnose injuries.</p>
+
+    <nav class="page-nav" aria-label="Page sequence">
+      <a href="index.html">← Home</a>
+      <a href="movement-over-time.html">Next: 2. Understanding Athletic Movement Over Time →</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div>CS 663 Project 1 Research Tutorial · Gary Wu · Researched and written by Gary Wu, with AI assistance in drafting, diagrams, and site code.</div>
+  </footer>
+</body>
+</html>
